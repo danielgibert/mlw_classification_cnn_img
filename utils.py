@@ -48,7 +48,7 @@ def convert_mlw_to_img(self, bytes_filepath, width=28, height=28):
         Array-like structure containing the representation of the malware sample as a gray-scale image
     """
 
-    with open(self.pe_filepath) as hex_file:
+    with open(bytes_filepath) as hex_file:
         #Extract hex values
         hex_array = []
         for line in hex_file.readlines():
@@ -58,19 +58,19 @@ def convert_mlw_to_img(self, bytes_filepath, width=28, height=28):
             hex_array.append([int(i, 16) if i != '??' else 0 for i in hex_values[1:]])
         hex_array = np.array(hex_array)
 
-        #Convert to an image of a specific size
-        if hex_array.shape[1] != 16:
-            assert (False)
-        b = int((hex_array.shape[0] * 16) ** (0.5))
-        b = 2 ** (int(math.log(b) / math.log(2)) + 1)
-        a = int(hex_array.shape[0] * 16 / b)
-        hex_array = hex_array[:a * b / 16, :]
-        im = np.reshape(hex_array, (a, b))
+    #Convert to an image of a specific size
+    if hex_array.shape[1] != 16:
+        assert (False)
+    b = int((hex_array.shape[0] * 16) ** (0.5))
+    b = 2 ** (int(math.log(b) / math.log(2)) + 1)
+    a = int(hex_array.shape[0] * 16 / b)
+    hex_array = hex_array[:a * b / 16, :]
+    im = np.reshape(hex_array, (a, b))
 
-        if width is not None and height is not None:
-            #Downsample
-            im = PIL.Image.fromarray(np.uint8(im))
-            im = im.resize((width, height), resample=PIL.Image.ANTIALIAS)
-            im = np.array(im.getdata())
+    if width is not None and height is not None:
+        #Downsample
+        im = PIL.Image.fromarray(np.uint8(im))
+        im = im.resize((width, height), resample=PIL.Image.ANTIALIAS)
+        im = np.array(im.getdata())
 
-        return im
+    return im
